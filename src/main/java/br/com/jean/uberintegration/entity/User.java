@@ -1,66 +1,60 @@
 package br.com.jean.uberintegration.entity;
 
+import br.com.jean.uberintegration.domain.user.UserRole;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.UUID;
+import java.util.Collection;
+import java.util.List;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity
-@Table(name = "Users")
-public class User
-{
+@Table(name = "users")
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @Column(nullable = false, name = "roles")
-    private String roles;
-
-    @Column(nullable = false, name = "name")
-    private String name;
-
-    @Column(nullable = true, name = "password")
+    private String id;
+    private String login;
     private String password;
+    private UserRole role;
 
-    @Column(nullable = true, name = "oauth")
-    private String oauth;
-
-    public String getRoles() {
-        return roles;
-    }
-
-    public void setRoles(String roles) {
-        this.roles = roles;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
+    public User(String login, String password, UserRole role){
+        this.login = login;
         this.password = password;
+        this.role = role;
     }
 
-    public String getOauth() {
-        return oauth;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if(this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    public void setOauth(String oauth) {
-        this.oauth = oauth;
+    public String getUsername() {
+        return login;
     }
 
-    public UUID getId() {
-        return id;
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    public boolean isEnabled() {
+        return true;
     }
 }
