@@ -45,7 +45,6 @@ public class SecurityTest {
     }
 
     @Test
-    @Role()
     void login() throws Exception {
 
         AuthenticationDTO login = AuthenticationDTO
